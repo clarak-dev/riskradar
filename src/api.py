@@ -1,58 +1,58 @@
-"""
-API do RiskRadar.
-
-Responsável por expor um endpoint para:
-- receber dados de um cliente
-- calcular o risco de inadimplência usando o modelo treinado
-- salvar a previsão no banco
-"""
-
 from fastapi import FastAPI
 from pydantic import BaseModel
-import numpy as np
+import pandas as pd
 
-from .model import load_model, predict_risk
-from .database import init_db, salvar_predicao
-
+from src.model import load_model
+from src.database import salvar_previsao, create_table
 
 app = FastAPI(title="RiskRadar API")
 
-model = None  # será carregado no startup
+# Garantir tabela
+create_table()
 
+# Carregar modelo
+model = load_model()
 
+# Modelo de entrada (JSON → Python)
 class Cliente(BaseModel):
     renda: float
     idade: int
-    # futuramente podemos adicionar mais campos aqui
+    tempo_emprego_anos: float
+    valor_divida: float
+    num_atrasos_12m: int
+    utilizacao_credito: float
+    possui_cartao_credito: int
+    score_interno: int
+    relacao_divida_renda: float
 
+@app.post("/prever_risco")
+def prever_risco_api(cliente: Cliente):
 
-@app.on_event("startup")
-def startup_event():
-    """Executado quando a API é iniciada."""
-    global model
-    init_db()
-    model = load_model()
+    # Transformar entrada em DataFrame
+    dados = cliente.dict()
+    df = pd.DataFrame([dados])
 
+    # MESMA ordem de colunas usada no treino
+    colunas_ordenadas = [
+        "idade",
+        "renda",
+        "tempo_emprego_anos",
+        "valor_divida",
+        "num_atrasos_12m",
+        "utilizacao_credito",
+        "possui_cartao_credito",
+        "score_interno",
+        "relacao_divida_renda",
+    ]
+    df = df[colunas_ordenadas]
 
-def classificar_risco(score: float) -> str:
-    """Classifica o risco em faixas a partir do score."""
-    if score < 0.33:
-        return "baixo"
-    elif score < 0.66:
-        return "médio"
-    else:
-        return "alto"
+    # Fazer previsão
+    risco = model.predict_proba(df)[0][1]
 
+    # Salvar no banco
+    salvar_previsao(dados, risco)
 
-@app.post("/predict")
-def predict(cliente: Cliente):
-    """
-    Recebe os dados de um cliente, calcula o risco e salva no banco.
-    """
-    input_array = np.array([[cliente.renda, cliente.idade]])
-    score = float(predict_risk(model, input_array)[0])
-    risco = classificar_risco(score)
-
-    salvar_predicao(cliente.renda, cliente.idade, score, risco)
-
-    return {"score": score, "risco": risco}
+    return {
+        "risco_previsto": float(risco),
+        "mensagem": "Previsão registrada no banco com sucesso!"
+    }

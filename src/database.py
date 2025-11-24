@@ -1,53 +1,64 @@
-"""
-Módulo de integração com o banco de dados do RiskRadar.
-
-Responsável por:
-- criar a tabela de previsões (se ainda não existir)
-- salvar novas previsões realizadas pelo modelo
-"""
-
 import sqlite3
 from datetime import datetime
 
-DB_PATH = "riskradar.db"
+DB_PATH = "risk.db"
 
-
-def get_connection():
-    """Abre uma conexão com o banco SQLite."""
+def create_connection():
+    """Cria uma conexão com o banco SQLite."""
     conn = sqlite3.connect(DB_PATH)
     return conn
 
+def create_table():
+    """Cria tabela de previsões se não existir."""
+    conn = create_connection()
+    cursor = conn.cursor()
 
-def init_db():
-    """Cria a tabela de previsões, caso ainda não exista."""
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute(
-        """
-        CREATE TABLE IF NOT EXISTS predicoes (
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS previsoes_risco (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             renda REAL,
             idade INTEGER,
-            score REAL,
-            risco_previsto TEXT,
+            tempo_emprego REAL,
+            valor_divida REAL,
+            num_atrasos INTEGER,
+            utilizacao_credito REAL,
+            possui_cartao INTEGER,
+            score_interno INTEGER,
+            relacao_divida_renda REAL,
+            risco_previsto REAL,
             timestamp TEXT
         );
-        """
-    )
+    """)
+
     conn.commit()
     conn.close()
 
+def salvar_previsao(features: dict, risco: float):
+    """Salva as features e o resultado da previsão no banco."""
+    conn = create_connection()
+    cursor = conn.cursor()
 
-def salvar_predicao(renda, idade, score, risco_previsto):
-    """Insere uma nova previsão na tabela de predicoes."""
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute(
-        """
-        INSERT INTO predicoes (renda, idade, score, risco_previsto, timestamp)
-        VALUES (?, ?, ?, ?, ?);
-        """,
-        (renda, idade, score, risco_previsto, datetime.now().isoformat()),
-    )
+    cursor.execute("""
+        INSERT INTO previsoes_risco (
+            renda, idade, tempo_emprego, valor_divida,
+            num_atrasos, utilizacao_credito, possui_cartao,
+            score_interno, relacao_divida_renda,
+            risco_previsto, timestamp
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        features["renda"],
+        features["idade"],
+        features["tempo_emprego_anos"],
+        features["valor_divida"],
+        features["num_atrasos_12m"],
+        features["utilizacao_credito"],
+        features["possui_cartao_credito"],
+        features["score_interno"],
+        features["relacao_divida_renda"],
+        risco,
+        datetime.now().isoformat()
+    ))
+
     conn.commit()
     conn.close()
+
