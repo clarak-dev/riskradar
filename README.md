@@ -1,9 +1,9 @@
 # RiskRadar – Sistema de Análise de Risco de Crédito
 
 O **RiskRadar** é um projeto que desenvolvi para estudar, na prática, como funcionam modelos de risco de crédito usados por bancos e fintechs.  
-Aqui eu simulei um mini motor de decisão capaz de prever a probabilidade de inadimplência de um cliente a partir de variáveis financeiras e comportamentais.
+Aqui eu simulo um mini motor de decisão capaz de prever a probabilidade de inadimplência de um cliente com base em variáveis financeiras e comportamentais.
 
-O projeto foi construído do zero: geração da base, EDA, criação das features, modelo, persistência, API e testes no Swagger.
+O projeto foi construído do zero: geração da base, EDA, criação de features, treinamento do modelo, persistência, API e testes no Swagger.
 
 ---
 
@@ -11,12 +11,12 @@ O projeto foi construído do zero: geração da base, EDA, criação das feature
 
 Criar um sistema completo de previsão de risco de crédito, passando por:
 
-- análise e preparação de dados  
-- feature engineering  
-- treinamento de modelo (Regressão Logística)  
-- construção de uma API com FastAPI  
-- armazenamento das previsões em SQLite  
-- testes reais via Swagger UI  
+- Análise e preparação de dados  
+- Feature engineering  
+- Treinamento de modelo (Regressão Logística)  
+- Construção de uma API com FastAPI  
+- Armazenamento das previsões em SQLite  
+- Testes reais via Swagger UI  
 
 Tudo isso simulando o fluxo real utilizado em motores de crédito.
 
@@ -24,13 +24,13 @@ Tudo isso simulando o fluxo real utilizado em motores de crédito.
 
 ## 📊 Tecnologias utilizadas
 
-- Python 3.11  
+- Python  
 - Pandas, NumPy  
 - Scikit-Learn  
 - Matplotlib e Seaborn  
 - FastAPI + Uvicorn  
 - SQLite  
-- Streamlit (próximos passos)  
+- Streamlit *(próximos passos)*  
 - Git e GitHub  
 
 ---
@@ -38,125 +38,132 @@ Tudo isso simulando o fluxo real utilizado em motores de crédito.
 ## 📁 Estrutura do Projeto
 
 riskradar/
-├── data/ # Base de dados sintética
-├── notebooks/ # EDA e experimentos
+├── data/
+│ └── credit_data.csv
+├── notebooks/
 │ └── 01_eda.ipynb
-├── models/ # Modelo treinado (model.pkl)
-├── src/ # Código principal
+├── models/
+│ └── model.pkl
+├── src/
 │ ├── preprocessing.py
 │ ├── model.py
 │ ├── api.py
 │ └── database.py
-├── dashboard/ # (em construção) Streamlit App
+├── dashboard/ # (em desenvolvimento)
+├── risk.db # gerado pela API automaticamente
 ├── requirements.txt
 └── README.md
 
-yaml
-Copiar código
 
 ---
 
 ## 🧠 Modelo Preditivo
 
-Utilizei a **Regressão Logística**, por ser um modelo clássico e bastante usado para crédito.
+Utilizei a **Regressão Logística**, um modelo clássico e amplamente usado em crédito por ser:
 
-Métricas avaliadas:
+- Interpretável  
+- Eficiente  
+- Adequado para classificação binária  
+
+### **Métricas avaliadas**
 
 - AUC  
 - F1-score  
-- Matriz de confusão  
+- Matriz de Confusão  
 
-As features consideradas incluem:
+### **Principais variáveis do modelo**
 
 - idade  
 - renda  
 - tempo de emprego  
-- valor da dívida  
+- valor total da dívida  
 - atrasos nos últimos 12 meses  
 - utilização de crédito  
 - score interno  
 - relação dívida/renda  
+- possui cartão de crédito  
 
 ---
 
 ## 🚀 API – FastAPI
 
-A API expõe um endpoint:
+A API recebe os dados de um cliente e retorna a probabilidade estimada de inadimplência.
+
+### 📌 **Endpoint principal**
+
 
 POST /prever_risco
 
-css
-Copiar código
-
-Envia os dados de um cliente e retorna a probabilidade estimada de inadimplência:
+### **Exemplo de entrada JSON**
 
 ```json
 {
-  "risco_previsto": 0.12,
-  "mensagem": "Previsão registrada no banco com sucesso!"
+  "idade": 45,
+  "renda": 3200.5,
+  "tempo_emprego_anos": 3.5,
+  "valor_divida": 1500.9,
+  "num_atrasos_12m": 1,
+  "utilizacao_credito": 0.42,
+  "possui_cartao_credito": 1,
+  "score_interno": 650,
+  "relacao_divida_renda": 0.46
 }
-A documentação automática está disponível em:
 
-arduino
-Copiar código
+📌 Documentação automática do Swagger
+
 http://127.0.0.1:8000/docs
+
 🗄 Armazenamento no SQLite
-Cada previsão feita pela API é automaticamente salva no banco local risk.db com:
 
-dados do cliente
+Cada previsão feita pela API é salva automaticamente no banco risk.db com:
 
-risco calculado
+Dados enviados pelo cliente
 
-timestamp da operação
+Probabilidade prevista
 
-Isso simula como instituições financeiras registram decisões de crédito.
+Timestamp da requisição
 
-🙋‍♀️ Minha Motivação
-Sempre tive interesse na área de dados e em como bancos tomam decisões baseadas em modelos estatísticos e machine learning.
-Decidi criar este projeto para:
+Essa estrutura simula como motores de crédito reais registram decisões para auditoria e análise posterior.
 
-aprender conceitos de crédito
+Minha motivação
 
-reforçar modelagem e EDA
+Sempre tive interesse em entender como bancos e instituições financeiras usam dados para tomar decisões importantes.
+Este projeto foi a minha forma de:
 
-praticar FastAPI
+Praticar machine learning aplicado
 
-montar um projeto completo para meu portfólio
+Consolidar conhecimentos de API e backend
 
-Foi um desafio, mas também uma experiência muito boa para consolidar o que venho estudando.
+Entender o fluxo completo de um motor de risco
 
-🔧 Como executar
-bash
-Copiar código
-git clone https://github.com/clarak-dev/riskradar.git
-cd riskradar
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn src.api:app --reload
-Depois é só acessar:
+Criar um projeto forte e realista para meu portfólio
 
-arduino
-Copiar código
-http://127.0.0.1:8000/docs
-📌 Próximos passos (roadmap pessoal)
- Criar o dashboard no Streamlit
+Foi um aprendizado enorme, muito próximo da prática do mercado.
 
- Mostrar métricas de modelo e gráficos no front-end
 
- Página para simular clientes manualmente
 
- Deploy da API (Render/Railway)
 
- Deploy do dashboard (Streamlit Cloud)
+📌 Próximos passos
 
- Melhorar explicabilidade com SHAP
+ Criar dashboard no Streamlit
 
- Testes automatizados
+ Visualizar métricas e gráficos do modelo
 
- Adicionar CI/CD simples
+ Criar página de simulação de clientes
+
+ Deploy da API (Render, Railway ou HuggingFace Spaces)
+
+ Deploy do dashboard
+
+ Adicionar explicabilidade com SHAP
+
+ Criar testes unitários
+
+ Implementar CI/CD simples
+
+
 
 📬 Contato
-Se quiser conversar sobre o projeto, ideias ou melhorias:
 
+Clara Kricia Araujo de Paulo
 linkedin.com/in/clarakricia-dev/
