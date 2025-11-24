@@ -1,169 +1,70 @@
-# RiskRadar – Sistema de Análise de Risco de Crédito
+# RiskRadar — Sistema Inteligente de Avaliação de Risco de Crédito
 
-O **RiskRadar** é um projeto que desenvolvi para estudar, na prática, como funcionam modelos de risco de crédito usados por bancos e fintechs.  
-Aqui eu simulo um mini motor de decisão capaz de prever a probabilidade de inadimplência de um cliente com base em variáveis financeiras e comportamentais.
+O **RiskRadar** é um projeto que desenvolvi para simular um sistema real de análise de risco de crédito.  
+Ele cobre todo o fluxo: desde a criação e exploração dos dados, passando pelo treinamento de um modelo estatístico, até a disponibilização de uma **API funcional** capaz de receber informações de um cliente e retornar a probabilidade estimada de inadimplência.
 
-O projeto foi construído do zero: geração da base, EDA, criação de features, treinamento do modelo, persistência, API e testes no Swagger.
-
----
-
-## 🚀 Objetivo
-
-Criar um sistema completo de previsão de risco de crédito, passando por:
-
-- Análise e preparação de dados  
-- Feature engineering  
-- Treinamento de modelo (Regressão Logística)  
-- Construção de uma API com FastAPI  
-- Armazenamento das previsões em SQLite  
-- Testes reais via Swagger UI  
-
-Tudo isso simulando o fluxo real utilizado em motores de crédito.
+Esse projeto nasceu da minha vontade de entender profundamente como soluções de crédito são construídas na prática e, ao mesmo tempo, fortalecer minhas habilidades em **Python, Machine Learning, APIs, organização de projetos e boas práticas de desenvolvimento**.
 
 ---
 
-## 📊 Tecnologias utilizadas
+## 🔍 Visão Geral Técnica
 
-- Python  
-- Pandas, NumPy  
-- Scikit-Learn  
-- Matplotlib e Seaborn  
-- FastAPI + Uvicorn  
-- SQLite  
-- Streamlit *(próximos passos)*  
-- Git e GitHub  
+O sistema foi construído com foco em clareza, modularidade e evolução futura.  
+Principais componentes:
 
----
+- **Modelo preditivo:** Regressão Logística  
+- **Base de dados:** Simulação sintética realista  
+- **API:** FastAPI  
+- **Banco local:** SQLite (armazenando o histórico de previsões)  
+- **Pipeline modular:**  
+  - `preprocessing.py` — limpeza e engenharia de atributos  
+  - `model.py` — treinamento e carregamento do modelo  
+  - `api.py` — rotas e lógica de previsão  
+  - `database.py` — registro das previsões na base  
 
-## 📁 Estrutura do Projeto
-
-riskradar/
-├── data/
-│ └── credit_data.csv
-├── notebooks/
-│ └── 01_eda.ipynb
-├── models/
-│ └── model.pkl
-├── src/
-│ ├── preprocessing.py
-│ ├── model.py
-│ ├── api.py
-│ └── database.py
-├── dashboard/ # (em desenvolvimento)
-├── risk.db # gerado pela API automaticamente
-├── requirements.txt
-└── README.md
-
+Estrutura preparada para expansão sem quebrar o fluxo atual.
 
 ---
 
-## 🧠 Modelo Preditivo
+## 🎯 O que o Projeto Representa
 
-Utilizei a **Regressão Logística**, um modelo clássico e amplamente usado em crédito por ser:
+Além de ser um estudo técnico, o RiskRadar representa minha forma de aprender:
 
-- Interpretável  
-- Eficiente  
-- Adequado para classificação binária  
+- gosto de entender o processo completo, e não apenas uma etapa isolada  
+- escrevo código de forma organizada e fácil de manter  
+- construo projetos pensando em crescimento e uso real  
+- busco sempre conectar tecnologia com impacto prático  
 
-### **Métricas avaliadas**
-
-- AUC  
-- F1-score  
-- Matriz de Confusão  
-
-### **Principais variáveis do modelo**
-
-- idade  
-- renda  
-- tempo de emprego  
-- valor total da dívida  
-- atrasos nos últimos 12 meses  
-- utilização de crédito  
-- score interno  
-- relação dívida/renda  
-- possui cartão de crédito  
+Ele também demonstra minha evolução como estudante de **Análise e Desenvolvimento de Sistemas** e meu interesse por **dados aplicados ao mercado financeiro**.
 
 ---
 
-## 🚀 API – FastAPI
+## 💡 Motivação
 
-A API recebe os dados de um cliente e retorna a probabilidade estimada de inadimplência.
+Sempre fui curiosa sobre como bancos e fintechs tomam decisões de crédito.  
+Criar o RiskRadar foi a maneira que encontrei de transformar essa curiosidade em prática — criando algo que realmente se parece com um sistema inicial de risco utilizado em ambientes reais.
 
-### 📌 **Endpoint principal**
+Além disso, é um projeto que reforça minha preparação para oportunidades em:
 
+- dados  
+- machine learning aplicado  
+- back-end  
+- produtos financeiros  
+- IA e automações  
 
-POST /prever_risco
+---
 
-### **Exemplo de entrada JSON**
+## 🚀 Próximos Passos
 
-```json
-{
-  "idade": 45,
-  "renda": 3200.5,
-  "tempo_emprego_anos": 3.5,
-  "valor_divida": 1500.9,
-  "num_atrasos_12m": 1,
-  "utilizacao_credito": 0.42,
-  "possui_cartao_credito": 1,
-  "score_interno": 650,
-  "relacao_divida_renda": 0.46
-}
+O projeto está preparado para crescer. Os próximos objetivos incluem:
 
-📌 Documentação automática do Swagger
+- testar modelos mais avançados (Random Forest, XGBoost, LightGBM)  
+- aplicar técnicas de explicabilidade (SHAP, LIME)  
+- criar um dashboard analítico interativo  
+- adicionar versionamento de modelos  
+- hospedar a API em nuvem (Render, Railway, AWS)  
+- implementar monitoramento de drift e qualidade do modelo  
+- enriquecer a base com dados sintéticos ainda mais realistas  
 
-http://127.0.0.1:8000/docs
+---
 
-🗄 Armazenamento no SQLite
-
-Cada previsão feita pela API é salva automaticamente no banco risk.db com:
-
-Dados enviados pelo cliente
-
-Probabilidade prevista
-
-Timestamp da requisição
-
-Essa estrutura simula como motores de crédito reais registram decisões para auditoria e análise posterior.
-
-Minha motivação
-
-Sempre tive interesse em entender como bancos e instituições financeiras usam dados para tomar decisões importantes.
-Este projeto foi a minha forma de:
-
-Praticar machine learning aplicado
-
-Consolidar conhecimentos de API e backend
-
-Entender o fluxo completo de um motor de risco
-
-Criar um projeto forte e realista para meu portfólio
-
-Foi um aprendizado enorme, muito próximo da prática do mercado.
-
-
-
-
-📌 Próximos passos
-
- Criar dashboard no Streamlit
-
- Visualizar métricas e gráficos do modelo
-
- Criar página de simulação de clientes
-
- Deploy da API (Render, Railway ou HuggingFace Spaces)
-
- Deploy do dashboard
-
- Adicionar explicabilidade com SHAP
-
- Criar testes unitários
-
- Implementar CI/CD simples
-
-
-
-📬 Contato
-
-Clara Kricia Araujo de Paulo
-linkedin.com/in/clarakricia-dev/
