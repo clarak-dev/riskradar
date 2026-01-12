@@ -1,5 +1,4 @@
 [
-  "id_cliente",
   "idade",
   "renda",
   "tempo_emprego_anos",
@@ -8,7 +7,5 @@
   "utilizacao_credito",
   "possui_cartao_credito",
   "score_interno",
-  "relacao_divida_renda",
-  "alto_endividamento",
-  "cliente_novo"
+  "relacao_divida_renda"
 ]
